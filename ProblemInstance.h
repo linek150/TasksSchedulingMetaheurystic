@@ -1,3 +1,6 @@
+#ifndef PROBLEM_INSTANCE_H
+#define PROBLEM_INSTANCE_H
+
 #include <random>
 class ProblemInstance{
     public:
@@ -15,3 +18,5 @@ class ProblemInstance{
         std::uniform_int_distribution<uint32_t> _rngDistribution;
 
 };
+
+#endif /* !PROBLEM_INSTANCE_H */
