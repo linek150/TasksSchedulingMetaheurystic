@@ -15,7 +15,7 @@ void Greedy::solve() {
         tabPrint(processorsArray, problem->numOfProcessors);
 }
 
-int32_t minIndexOf(uint32_t* tab, int32_t size) {
+int32_t minIndexOf(uint32_t* tab, uint32_t size) {
     int32_t minIndex = -1;
     for(int32_t i = 0; i < size; i++) {
         if(minIndex == -1) {
