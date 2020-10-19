@@ -1,3 +1,6 @@
+#ifndef GREEDY_H
+#define GREEDY_H
+
 #include <iostream>
 #include <vector>
 
@@ -16,3 +19,5 @@ public:
 
 int32_t minIndexOf(uint32_t* tab, uint32_t size);
 void tabPrint(std::vector<uint32_t> *tab, uint32_t size);
+
+#endif /* !GREEDY_H */
