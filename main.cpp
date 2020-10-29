@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "ProblemInstance.h"
+#include "SchedulingAlgorithm.h"
 #include "Greedy.h"
 
 using namespace std;
