@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 ProblemInstance::ProblemInstance(uint32_t numOfTasks, uint32_t numOfProcessors, uint32_t maxTaskTime, uint32_t minTaskTime)
 {
@@ -20,6 +21,10 @@ void ProblemInstance::commonInit(uint32_t maxTaskTime,uint32_t minTaskTime)
     this->tasksArray=nullptr;
     std::random_device rd;
     this->_rngEngine = std::mt19937_64(rd());
+
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    this->_rngEngine.seed((unsigned long)seed);
+
     this->_rngDistribution = std::uniform_int_distribution<uint32_t>(minTaskTime, maxTaskTime);
 }
 bool ProblemInstance::setTaskTime(uint32_t maxTaskTime, uint32_t minTaskTime)
@@ -108,7 +113,7 @@ void ProblemInstance::makeTasksArray(std::vector<uint32_t> *processors)
             taskIdx++;
         }
     }
-    std::random_shuffle(this->tasksArray, this->tasksArray + this->numOfTasks - 1);
+    //std::random_shuffle(this->tasksArray, this->tasksArray + this->numOfTasks - 1);
     
 }
 uint32_t ProblemInstance::cMax()
