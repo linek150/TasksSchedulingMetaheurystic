@@ -10,6 +10,7 @@
 class Greedy: public SchedulingAlgorithm {
 public:
     Greedy(ProblemInstance* pi);
+    ~Greedy();
 
     void solve();
 };
