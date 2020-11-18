@@ -114,7 +114,9 @@ void ProblemInstance::makeTasksArray(std::vector<uint32_t> *processors)
             taskIdx++;
         }
     }
-    std::random_shuffle(this->tasksArray, this->tasksArray + this->numOfTasks - 1);
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle (this->tasksArray, this->tasksArray + this->numOfTasks - 1, std::default_random_engine(seed));
+    //std::random_shuffle(this->tasksArray, this->tasksArray + this->numOfTasks - 1);
     
 }
 uint32_t ProblemInstance::cMax()
