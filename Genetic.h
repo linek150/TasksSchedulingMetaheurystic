@@ -7,6 +7,7 @@
 #include "ProblemInstance.h"
 #include "SchedulingAlgorithm.h"
 #include "Individual.h"
+const uint32_t numberOfParents=2;
 enum Method: uint32_t
 {
         Turney,Rank,Turney_Rank

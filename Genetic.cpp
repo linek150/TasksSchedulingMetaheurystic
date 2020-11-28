@@ -29,8 +29,8 @@ Genetic::Genetic(ProblemInstance *pi,
 void Genetic::adjustParameters()
 {
 
-    reproductionGroupSize=(2/childrenNumber)*reproductionRatio*populationSize;
-    if(reproductionGroupSize%2!=0)reproductionGroupSize--;
+    reproductionGroupSize=(numOfParents/childrenNumber)*reproductionRatio*populationSize;
+    if(reproductionGroupSize%numOfParents!=0)reproductionGroupSize--;
     if (this->method!=Rank)
     {
         if(this->method==Turney)
@@ -43,4 +43,17 @@ void Genetic::adjustParameters()
             fightGroupSize=ceil(populationSize/(reproductionGroupSize/tourneyRatio));
         }
     }   
+}
+void Genetic::generatePopulation()
+{
+    delete [] this->population;
+    this->population=new Individual[this->populationSize](this->problem);
+}
+void Genetic::crossover()
+{
+    for (int  i = 0; i < reproductionGroupSize/numOfParents; i++)
+    {
+        
+    }
+    
 }
