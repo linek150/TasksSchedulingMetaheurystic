@@ -7,7 +7,7 @@
 #include "ProblemInstance.h"
 #include "SchedulingAlgorithm.h"
 #include "Individual.h"
-const uint32_t numberOfParents=2;
+#include <random>
 enum Method: uint32_t
 {
         Turney,Rank,Turney_Rank
@@ -19,13 +19,14 @@ enum Condition: uint32_t
 class Genetic: public SchedulingAlgorithm {
 public:
     Genetic(ProblemInstance *pi,
-                 uint32_t populationSize=0,
-                uint32_t childrenNumber=0,
+                 uint32_t populationSize=100,
+                uint32_t numOfChildren=2,
+                uint32_t numOfParents=2,
                 uint32_t stopValue=0,
-                float tourneyRatio=-1,
-                float mutationChance=-1,
-                float mutationRatio=-1,
-                float reproductionRatio=-1,
+                float tourneyRatio=0.5,
+                float mutationChance=0.01,
+                float mutationRatio=0.1,
+                float reproductionRatio=0.5,
                 Method method=Rank,
                 Condition stopCondition=Time);
     
@@ -35,19 +36,33 @@ public:
     
 private:
     Individual* population;
-    Individual* reproductionArray;
+    Individual* repArr;
+    Individual* _children;
+    uint32_t* _childGenes;
 
-    uint32_t populationSize=100;
-    uint32_t childrenNumber=2;
-    uint32_t fightGroupSize=0;
-    uint32_t stopValue=0;
-    uint32_t reproductionGroupSize=0;
-    float tourneyRatio=0.5;
-    float mutationChance=0.01;
-    float mutationRatio=0.1;
-    float reproductionRatio=0.5;
-    Method method=Rank;
-    Condition stopCondition=Time; 
+    ProblemInstance* problem;
+
+    uint32_t populationSize;
+    uint32_t numOfChildren;
+    uint32_t numOfParents;
+    uint32_t fightGroupSize;
+    uint32_t stopValue;
+    uint32_t repGroupSize;
+    float tourneyRatio;
+    float mutationChance;
+    float mutationRatio;
+    float reproductionRatio;
+    Method method;
+    Condition stopCondition; 
+
+    std::mt19937_64* _rngEngine;
+    uint32_t* _repGrpSizeOrd;//order of crossover
+    uint32_t* _repGenOrder;
+    uint32_t _parentPart;
+    uint32_t _remGenes;
+
+    static uint32_t* genOrderArr(uint32_t numOfElements);
+
     void adjustParameters();
     void tourney();
     void rank();

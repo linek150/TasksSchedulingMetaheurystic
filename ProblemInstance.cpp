@@ -19,9 +19,6 @@ ProblemInstance::ProblemInstance(const char* fileName)
 void ProblemInstance::commonInit(uint32_t maxTaskTime,uint32_t minTaskTime)
 {
     this->tasksArray=nullptr;
-    //std::random_device rd;
-    //this->_rngEngine = std::mt19937_64(rd());
-    this->_rngEngine = std::mt19937_64();
 
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     this->_rngEngine.seed((unsigned long)seed);
@@ -115,8 +112,7 @@ void ProblemInstance::makeTasksArray(std::vector<uint32_t> *processors)
         }
     }
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    shuffle (this->tasksArray, this->tasksArray + this->numOfTasks - 1, std::default_random_engine(seed));
-    //std::random_shuffle(this->tasksArray, this->tasksArray + this->numOfTasks - 1);
+    shuffle (this->tasksArray, this->tasksArray + this->numOfTasks - 1, this->_rngEngine);
     
 }
 uint32_t ProblemInstance::cMax()

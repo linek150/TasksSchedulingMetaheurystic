@@ -23,3 +23,11 @@ void Individual::findFitness(){
     }
     delete[] tmp;
 }
+
+void Individual::copyGenes(Individual& parent,uint32_t numOfGenes,uint32_t* order,uint32_t offset)
+{
+    for (uint32_t gene = offset; gene < numOfGenes; gene++)
+    {
+        this->genes[gene]=parent.genes[order[gene]];
+    }
+}
