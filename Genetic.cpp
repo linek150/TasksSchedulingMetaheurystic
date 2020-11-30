@@ -3,6 +3,7 @@
 #include <chrono>
 #include <algorithm>
 #include "Individual.h"
+#include <time.h>
 
 Genetic::Genetic(ProblemInstance *pi,
                  uint32_t populationSize,
@@ -141,10 +142,93 @@ void Genetic::crossover()
         
     }
 }
+
+void Genetic::sort()
+{
+    std::sort(population, population + populationSize, [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; } );
+}
+
 void Genetic::solve()
 {
+    adjustParameters();
+    switch (stopCondition)
+    {
+    case Time: {
+
+        const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+        const std::chrono::time_point end = start + std::chrono::seconds(30);
+
+        while(std::chrono::high_resolution_clock::now() <= end) {
+            sort();
+            solveIterated();
+        }
+        break;
+    }
+    case Iteration: {
+        for (uint32_t i = 0; i <= 100; i++){
+            sort();
+            solveIterated();
+        }
+        break;
+    }
+    }
+    sort();
 
 }
+
+void Genetic::solveIterated()
+{
+    switch (method)
+    {
+    case Rank:
+        rank();
+        crossover();
+        break;
+    case Turney:
+        tourney();
+        crossover();
+        break;
+    case Turney_Rank:
+        tourney();
+        rank();
+        crossover();
+        break;
+    }
+}
+
+void Genetic::rank()
+{
+    switch (method)
+    {
+    case Rank:{
+        this->repArr = new Individual[repGroupSize];
+        std::copy(population, population + repGroupSize, repArr);
+        break;
+    }
+    case Turney_Rank: {
+        this->repArr = new Individual[repGroupSize];
+        std::copy(tourArr, tourArr + repGroupSize, repArr);
+        break;
+    }
+    }
+}
+
+void Genetic::tourney()
+{
+    switch (method)
+    {
+    case Turney:{
+        this->repArr = new Individual[repGroupSize];
+        break;
+    }
+    case Turney_Rank: {
+        this->tourArr = new Individual[fightGroupSize];
+        break;
+    }
+    }
+}
+
+
 Genetic::~Genetic()
 {
     delete [] population;

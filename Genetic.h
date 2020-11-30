@@ -39,6 +39,7 @@ private:
     Individual* population;
     Individual* repArr;
     Individual* _siblings;
+    Individual* tourArr;
     uint32_t* _childGenes;
 
     ProblemInstance* problem;
@@ -65,10 +66,12 @@ private:
 
     static uint32_t* genOrderArr(uint32_t numOfElements);
 
+    void solveIterated();
     void adjustParameters();
     void tourney();
     void rank();
     void crossover();
+    void sort();
 };
 
 
