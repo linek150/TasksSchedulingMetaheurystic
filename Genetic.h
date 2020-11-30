@@ -69,6 +69,7 @@ private:
     void tourney();
     void rank();
     void crossover();
+    friend int main();
 };
 
 
