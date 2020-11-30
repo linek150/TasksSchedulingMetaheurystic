@@ -30,13 +30,16 @@ Genetic::Genetic(ProblemInstance *pi,
     this->problem = pi;
     adjustParameters();
     
-
     Individual::_staticProblem = this->problem;
+
+    this->repArr=new Individual[this->repGroupSize];
+    this->population=nullptr;
+
     this->_siblings = new Individual[this->numOfChildren];
     this->_childGenes = new uint32_t[pi->numOfTasks];
 
     this->_rngEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-    this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(0,this->problem->numOfProcessors);
+    this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(1,this->problem->numOfProcessors+1);
     this->_repGrpSizeOrd = genOrderArr(this->repGroupSize);
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
 }
@@ -135,7 +138,7 @@ void Genetic::crossover()
         uint32_t startIdx=populationSize-1-(curParrents+1)*numOfChildren;
         uint32_t finalIdx=startIdx+numOfChildren;
         //Raplace last postion from sorted population by new individuals
-        for (uint32_t idx=startIdx; startIdx < finalIdx;idx++ )
+        for (uint32_t idx=startIdx; idx < finalIdx;idx++ )
         {
             population[idx]=_siblings[idx-startIdx];
         }

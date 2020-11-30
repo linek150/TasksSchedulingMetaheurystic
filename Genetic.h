@@ -72,6 +72,7 @@ private:
     void rank();
     void crossover();
     void sort();
+    friend int main();
 };
 
 
