@@ -8,18 +8,22 @@
 class Individual {
 public:
     Individual(ProblemInstance* pi, uint32_t* genes);
+    Individual(uint32_t* genes);
     Individual();
     ~Individual();
 
 
-    Individual& operator =(const Individual& individualToCopy);// TODO deep assign - Piotr
-    static ProblemInstance* pi;
+    void operator =(const Individual& individualToCopy);
+    
     void findFitness();
     void copyGenes(Individual& parent,uint32_t numOfGenes,uint32_t* order,uint32_t offset=0);
-
+    void copyGenes(uint32_t* genes);
     ProblemInstance* problem;
     uint32_t fitness;
     uint32_t* genes;
+private:
+    static ProblemInstance* _staticProblem;
+friend class Genetic;
 };
 
 #endif /* !INDIVIDUAL_H */

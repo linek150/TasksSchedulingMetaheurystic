@@ -29,15 +29,16 @@ public:
                 float reproductionRatio=0.5,
                 Method method=Rank,
                 Condition stopCondition=Time);
-    
+    ~Genetic();
     void solve();
     void setMethod(Method method);
     void generatePopulation();
+
     
 private:
     Individual* population;
     Individual* repArr;
-    Individual* _children;
+    Individual* _siblings;
     uint32_t* _childGenes;
 
     ProblemInstance* problem;
@@ -56,8 +57,9 @@ private:
     Condition stopCondition; 
 
     std::mt19937_64* _rngEngine;
+    std::uniform_int_distribution<uint32_t>* _rngProcDistribution;
     uint32_t* _repGrpSizeOrd;//order of crossover
-    uint32_t* _repGenOrder;
+    uint32_t* _repGenOrd;
     uint32_t _parentPart;
     uint32_t _remGenes;
 

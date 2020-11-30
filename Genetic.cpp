@@ -3,11 +3,7 @@
 #include <chrono>
 #include <algorithm>
 #include "Individual.h"
-void Genetic::setMethod(Method method)
-{
-    this->method = method;
-    adjustParameters();
-}
+
 Genetic::Genetic(ProblemInstance *pi,
                  uint32_t populationSize,
                  uint32_t numOfChildren,
@@ -17,8 +13,9 @@ Genetic::Genetic(ProblemInstance *pi,
                  float mutationChance,
                  float mutationRatio,
                  float reproductionRatio,
-                 Method method = Rank,
-                 Condition stopCondition = Time) : SchedulingAlgorithm(pi)
+                 Method method,
+                 Condition stopCondition)
+                : SchedulingAlgorithm(pi)
 {
     this->populationSize = populationSize;
     this->numOfChildren = numOfChildren;
@@ -31,14 +28,21 @@ Genetic::Genetic(ProblemInstance *pi,
     this->stopCondition = stopCondition;
     this->problem = pi;
     adjustParameters();
-    Individual::pi = this->problem;
+    
 
+    Individual::_staticProblem = this->problem;
     this->_siblings = new Individual[this->numOfChildren];
     this->_childGenes = new uint32_t[pi->numOfTasks];
 
     this->_rngEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(0,this->problem->numOfProcessors);
     this->_repGrpSizeOrd = genOrderArr(this->repGroupSize);
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
+}
+void Genetic::setMethod(Method method)
+{
+    this->method = method;
+    adjustParameters();
 }
 uint32_t *Genetic::genOrderArr(uint32_t numOfElements)
 {
@@ -74,13 +78,24 @@ void Genetic::generatePopulation()
 {
     delete[] this->population;
     this->population = new Individual[this->populationSize];
+    uint32_t* genes;
+    genes=new uint32_t[this->problem->numOfTasks];
+    for ( uint32_t individual = 0; individual < this->populationSize; individual++)
+    {
+        for (uint32_t gene = 0; gene<this->problem->numOfTasks; gene++)
+        {
+            genes[gene]=(*this->_rngProcDistribution)(*this->_rngEngine);
+        }
+        population[individual].copyGenes(genes);
+    }
+    delete[] genes;
 }
 void Genetic::crossover()
 {
     //randomize parent selection
-    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + repGroupSize - 1, _rngEngine);
+    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + repGroupSize - 1, *_rngEngine);
     //randomize genes selection
-    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks - 1, _rngEngine);
+    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks - 1, *_rngEngine);
     //genes that need to be taken from first parents coused by numOfTasks%numOfParents!=0
     uint32_t remGenes = this->_remGenes;
     //additional offset coused by numOfTasks%numOfParents!=0
@@ -125,4 +140,19 @@ void Genetic::crossover()
         }
         
     }
+}
+void Genetic::solve()
+{
+
+}
+Genetic::~Genetic()
+{
+    delete [] population;
+    delete [] repArr;
+    delete [] _siblings;
+    delete [] _childGenes;
+    delete _rngEngine;
+    delete _rngProcDistribution;
+    delete [] _repGrpSizeOrd;
+    delete [] _repGenOrd;
 }

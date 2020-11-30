@@ -4,8 +4,6 @@ Greedy::Greedy(ProblemInstance* pi):SchedulingAlgorithm(pi) {
 }
 
 Greedy::~Greedy() {
-    delete[] processorsArray;
-    delete[] processorsTimes;
 }
 
 void Greedy::solve() {

@@ -13,7 +13,6 @@ int main() {
     g.solve();
     p.genFile("Test.txt");
 
-    //delete &g;
-    //delete &p;
+    
     return 0;
 }
