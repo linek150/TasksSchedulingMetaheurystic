@@ -73,6 +73,7 @@ void Genetic::adjustParameters()
         {
             tourneyRatio = reproductionRatio + (1 - reproductionRatio) * tourneyRatio;
             fightGroupSize = ceil(populationSize / (repGroupSize / tourneyRatio));
+            _tourGroupSize = populationSize/fightGroupSize + (populationSize % fightGroupSize != 0);
         }
     }
     this->_parentPart = this->problem->numOfTasks / numOfParents;
@@ -146,36 +147,45 @@ void Genetic::crossover()
     }
 }
 
-void Genetic::sort()
+void Genetic::sortPopulation()
 {
-    std::sort(population, population + populationSize, [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; } );
+    std::sort(population, population + populationSize,
+    [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; }
+    );
+}
+
+void Genetic::sortTourArr()
+{
+    std::sort(tourArr, tourArr + _tourGroupSize,
+    [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; }
+    );
 }
 
 void Genetic::solve()
 {
-    adjustParameters();
     switch (stopCondition)
     {
     case Time: {
 
         const std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-        const std::chrono::time_point end = start + std::chrono::seconds(30);
+        const std::chrono::time_point end = start + std::chrono::seconds(stopValue);
 
         while(std::chrono::high_resolution_clock::now() <= end) {
-            sort();
+            sortPopulation();
             solveIterated();
         }
         break;
     }
     case Iteration: {
-        for (uint32_t i = 0; i <= 100; i++){
-            sort();
+        for (uint32_t i = 0; i <= stopValue; i++){
+            sortPopulation();
             solveIterated();
         }
         break;
     }
     }
-    sort();
+    sortPopulation();
+    printf("Najlepszy cMAX wynosi: %u", population[0].fitness);
 
 }
 
@@ -185,18 +195,24 @@ void Genetic::solveIterated()
     {
     case Rank:
         rank();
-        crossover();
         break;
     case Turney:
         tourney();
-        crossover();
         break;
     case Turney_Rank:
         tourney();
         rank();
-        crossover();
         break;
     }
+    crossover();
+
+    /*if (method == Turney || method == Turney_Rank){
+        tourney();
+    }
+    if (method == Rank || method == Turney_Rank){
+        rank();
+    }
+    crossover();*/
 }
 
 void Genetic::rank()
@@ -210,7 +226,9 @@ void Genetic::rank()
     }
     case Turney_Rank: {
         this->repArr = new Individual[repGroupSize];
+        sortTourArr();
         std::copy(tourArr, tourArr + repGroupSize, repArr);
+        delete[] tourArr;
         break;
     }
     }
@@ -218,17 +236,43 @@ void Genetic::rank()
 
 void Genetic::tourney()
 {
-    switch (method)
-    {
-    case Turney:{
+    // Generate outcome array
+    Individual* tourOutArrName;
+    if(method == Turney){
         this->repArr = new Individual[repGroupSize];
-        break;
+        tourOutArrName = repArr;
     }
-    case Turney_Rank: {
-        this->tourArr = new Individual[fightGroupSize];
-        break;
+    else if(method == Turney_Rank){
+        this->tourArr = new Individual[_tourGroupSize];
+        tourOutArrName = tourArr;
     }
+
+    // Generate array to fight
+    uint32_t* tourPopArr = genOrderArr(populationSize);
+
+    /*uint32_t* tourPopArr = new uint32_t[populationSize];
+    for (uint32_t i = 0; i < populationSize; i++){
+        tourPopArr[i] = i;
+    }*/
+
+    // Shuffle array to fight
+    std::mt19937_64* tourneyEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    std::shuffle(tourPopArr, tourPopArr + populationSize, *tourneyEngine);
+
+    // Fight
+    for (uint32_t i = 0; i < populationSize; i++) {
+        if (i % fightGroupSize == 0) {
+            tourOutArrName[i/fightGroupSize] = population[tourPopArr[i]];
+        }
+        else {
+            if (population[tourPopArr[i]].fitness < tourOutArrName[i/fightGroupSize].fitness) {
+                tourOutArrName[i/fightGroupSize] = population[tourPopArr[i]];
+            }
+        }
     }
+
+    delete[] tourPopArr;
+    delete tourneyEngine;
 }
 
 

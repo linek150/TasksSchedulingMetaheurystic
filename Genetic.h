@@ -48,6 +48,7 @@ private:
     uint32_t numOfChildren;
     uint32_t numOfParents;
     uint32_t fightGroupSize;
+    uint32_t _tourGroupSize;
     uint32_t stopValue;
     uint32_t repGroupSize;
     float tourneyRatio;
@@ -71,7 +72,8 @@ private:
     void tourney();
     void rank();
     void crossover();
-    void sort();
+    void sortPopulation();
+    void sortTourArr();
     friend int main();
 };
 
