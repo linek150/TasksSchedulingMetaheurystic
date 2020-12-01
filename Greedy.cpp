@@ -12,5 +12,6 @@ void Greedy::solve() {
             processorsArray[index].push_back(problem->tasksArray[i]);
             processorsTimes[index] += problem->tasksArray[i];
         }
-        tabPrint(processorsArray, problem->numOfProcessors);
+        //tabPrint(processorsArray, problem->numOfProcessors);
+        maxCMAX(processorsArray, problem->numOfProcessors);
 }

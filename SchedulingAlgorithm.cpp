@@ -35,3 +35,19 @@ void tabPrint(std::vector<uint32_t> *tab, uint32_t size) {
         std::cout<<std::endl;
     }
 }
+
+void maxCMAX(std::vector<uint32_t> *tab, uint32_t size) {
+    uint32_t* tmp = new uint32_t[size]{0};
+    for(uint32_t i = 0; i < size; i++){
+        for(uint32_t k = 0; k < tab[i].size(); k++) {
+            tmp[i]+=tab[i][k];
+        }
+    }
+    uint32_t fit=tmp[0];
+    for(uint32_t i = 1; i < size; i++){
+        if(tmp[i] < fit) {
+            fit = tmp[i];
+        }
+    }
+    std::cout << "cMAX = " << fit << std::endl;
+}

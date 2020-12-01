@@ -8,8 +8,13 @@
 using namespace std;
 
 int main() {
+
+    ProblemInstance p("m10n200.txt");
+    Greedy g(&p);
+    g.solve();
+
     //towrzymy zmienne o informatywnych nazwach 
-    ProblemInstance p(10,3,15,1);
+    /*ProblemInstance p(10,3,15,1);
     Greedy g(&p);
     g.solve();
     p.genFile("Test.txt");
@@ -18,7 +23,7 @@ int main() {
     ProblemInstance k(7,3,5,1);
     Genetic j(&k, 7, 2, 2, 10, 0.5, 0.1, 0.1, 0.5, Rank, Iteration);
     j.generatePopulation();
-    j.solve();
+    j.solve();*/
 
     
     return 0;

@@ -34,6 +34,7 @@ Genetic::Genetic(ProblemInstance *pi,
 
     this->_repArr=new Individual[this->_repGroupSize];
     this->_population=nullptr;
+    this->_tourArr=nullptr;
 
     this->_siblings = new Individual[this->_numOfChildren];
     this->_childGenes = new uint32_t[pi->numOfTasks];
@@ -297,4 +298,5 @@ Genetic::~Genetic()
     delete _rngProcDistribution;
     delete [] _repGrpSizeOrd;
     delete [] _repGenOrd;
+    delete[] _tourArr;
 }

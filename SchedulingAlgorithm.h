@@ -20,5 +20,6 @@ protected:
 
 int32_t minIndexOf(uint32_t* tab, uint32_t size);
 void tabPrint(std::vector<uint32_t> *tab, uint32_t size);
+void maxCMAX(std::vector<uint32_t> *tab, uint32_t size);
 
 #endif /* !SCHEDULINGALGORITHM_H */
