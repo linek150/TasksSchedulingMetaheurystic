@@ -8,7 +8,7 @@
 using namespace std;
 
 int main() {
-
+    //towrzymy zmienne o informatywnych nazwach 
     ProblemInstance p(10,3,15,1);
     Greedy g(&p);
     g.solve();

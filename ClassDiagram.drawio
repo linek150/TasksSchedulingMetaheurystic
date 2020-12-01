@@ -1,6 +1,6 @@
-<mxfile host="65bd71144e" modified="2020-11-30T07:08:42.656Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="dqg-qwzwBpD_MRG0auaj" version="13.6.5">
+<mxfile host="65bd71144e" modified="2020-12-01T07:07:07.513Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="MQkzdiFH4j3dZlVm9EmO" version="13.6.5">
     <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-        <mxGraphModel dx="317" dy="790" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="829" dy="420" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="WIyWlLk6GJQsqaUBKTNV-0"/>
                 <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0"/>
@@ -51,7 +51,7 @@
                 <mxCell id="10" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" parent="8" vertex="1">
                     <mxGeometry y="230" width="290" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="+ Genetic(populationSize, childrenNumber,&#10;reproductionRatio, turneyRatio, mutationChance,&#10;mutationRatio, method , stopCondition) - P&#10;+ solve() - K &#10;+ setMethod(uint32_t method) - P&#10;+ generatePopulation() - P&#10;- adjustParameters() - P&#10;- tourney() - K&#10;- rank() - K&#10;- crossover() - P" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0" parent="8" vertex="1">
+                <mxCell id="11" value="+ Genetic(populationSize, childrenNumber,&#10;reproductionRatio, tourneyRatio, mutationChance,&#10;mutationRatio, method , stopCondition) - P&#10;+ solve() - K &#10;+ setMethod(uint32_t method) - P&#10;+ generatePopulation() - P&#10;- adjustParameters() - P&#10;- tourney() - K&#10;- rank() - K&#10;- crossover() - P" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0" parent="8" vertex="1">
                     <mxGeometry y="238" width="290" height="182" as="geometry"/>
                 </mxCell>
                 <mxCell id="12" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.517;entryY=1.04;entryDx=0;entryDy=0;entryPerimeter=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="8" target="CKv4PGzBGWJo2KeHRYD0-10" edge="1">

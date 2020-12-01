@@ -10,7 +10,7 @@
 #include <random>
 enum Method: uint32_t
 {
-        Turney,Rank,Turney_Rank
+        Tourney,Rank,Tourney_Rank
 };
 enum Condition: uint32_t
 {
@@ -36,27 +36,26 @@ public:
 
     
 private:
-    Individual* population;
-    Individual* repArr;
+    Individual* _population;
+    Individual* _repArr;
     Individual* _siblings;
-    Individual* tourArr;
+    Individual* _tourArr;
     uint32_t* _childGenes;
 
-    ProblemInstance* problem;
 
-    uint32_t populationSize;
-    uint32_t numOfChildren;
-    uint32_t numOfParents;
-    uint32_t fightGroupSize;
+    uint32_t _populationSize;
+    uint32_t _numOfChildren;
+    uint32_t _numOfParents;
+    uint32_t _fightGroupSize;
     uint32_t _tourGroupSize;
-    uint32_t stopValue;
-    uint32_t repGroupSize;
-    float tourneyRatio;
-    float mutationChance;
-    float mutationRatio;
-    float reproductionRatio;
-    Method method;
-    Condition stopCondition; 
+    uint32_t _stopValue;
+    uint32_t _repGroupSize;
+    float _tourneyRatio;
+    float _mutationChance;
+    float _mutationRatio;
+    float _reproductionRatio;
+    Method _method;
+    Condition _stopCondition; 
 
     std::mt19937_64* _rngEngine;
     std::uniform_int_distribution<uint32_t>* _rngProcDistribution;
@@ -68,13 +67,14 @@ private:
     static uint32_t* genOrderArr(uint32_t numOfElements);
 
     void solveIterated();
+    void findPopFitness();
     void adjustParameters();
     void tourney();
     void rank();
     void crossover();
     void sortPopulation();
     void sortTourArr();
-    friend int main();
+    friend int main();//remove after debug
 };
 
 

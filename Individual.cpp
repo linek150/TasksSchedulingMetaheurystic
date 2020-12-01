@@ -1,9 +1,9 @@
 #include "Individual.h"
 
 
-ProblemInstance* Individual::_staticProblem;
+ProblemInstance* Individual::_problem ;
 Individual::Individual(ProblemInstance* pi, uint32_t* genes){
-    this->problem = pi;
+    Individual::_problem = pi;
     this->genes=genes;
     findFitness();
 }
@@ -13,7 +13,7 @@ Individual::Individual(uint32_t* genes)
 }
 Individual::Individual()
 {
-    this->genes=new uint32_t[Individual::_staticProblem->numOfTasks]();
+    this->genes=new uint32_t[Individual::_problem ->numOfTasks]();
 }
 Individual::~Individual()
 {
@@ -22,7 +22,7 @@ Individual::~Individual()
 
 void Individual::operator=(const Individual&   individualToCopy)
 {
-    for (uint32_t i = 0; i < Individual::_staticProblem->numOfTasks; i++)
+    for (uint32_t i = 0; i < Individual::_problem ->numOfTasks; i++)
     {
         this->genes[i]=individualToCopy.genes[i];
     }
@@ -30,12 +30,12 @@ void Individual::operator=(const Individual&   individualToCopy)
 
 void Individual::findFitness()
 {
-    uint32_t* tmp = new uint32_t[problem->numOfProcessors]{0};
+    uint32_t* tmp = new uint32_t[Individual::_problem ->numOfProcessors]{0};
     fitness=0;
-    for(int i = 0; i < problem->numOfTasks; i++){
-        tmp[genes[i]]+=problem->tasksArray[i];
+    for(int i = 0; i < Individual::_problem ->numOfTasks; i++){
+        tmp[genes[i]]+=Individual::_problem ->tasksArray[i];
     }
-    for(int i = 0; i < problem->numOfProcessors; i++){
+    for(int i = 0; i < Individual::_problem ->numOfProcessors; i++){
         if(fitness<tmp[i]){
             fitness=tmp[i];
         }
@@ -52,7 +52,7 @@ void Individual::copyGenes(Individual& parent,uint32_t numOfGenes,uint32_t* orde
 }
 void Individual::copyGenes(uint32_t* genes)
 {
-    for (uint32_t gene = 0; gene < Individual::_staticProblem->numOfTasks; gene++)
+    for (uint32_t gene = 0; gene < Individual::_problem ->numOfTasks; gene++)
     {
         this->genes[gene]=genes[gene];
     }   
