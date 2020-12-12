@@ -32,9 +32,10 @@ Genetic::Genetic(ProblemInstance *pi,
     
     Individual::_problem  = this->problem;
 
-    this->_repArr=new Individual[this->_repGroupSize];
+    this->_repArr=nullptr;
     this->_population=nullptr;
     this->_tourArr=nullptr;
+    this->_tourPopArr=nullptr;
 
     this->_siblings = new Individual[this->_numOfChildren];
     this->_childGenes = new uint32_t[pi->numOfTasks];
@@ -45,7 +46,6 @@ Genetic::Genetic(ProblemInstance *pi,
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
 
     generatePopulation();
-    findPopFitness();
 }
 void Genetic::setMethod(Method method)
 {
@@ -146,6 +146,7 @@ void Genetic::crossover()
         //Raplace last postion from sorted _population by new individuals
         for (uint32_t idx=startIdx; idx < finalIdx;idx++ )
         {
+            // mutation(idx-startIdx);
             _population[idx]=_siblings[idx-startIdx];
         }
         
@@ -168,6 +169,17 @@ void Genetic::sortTourArr()
 
 void Genetic::solve()
 {
+    // Generate arrays
+    this->_repArr=new Individual[this->_repGroupSize];
+    if(_method == Tourney_Rank)
+    {
+        this->_tourArr = new Individual[_tourGroupSize];
+    }
+
+    // Generate array to fight
+    uint32_t* _tourPopArr = genOrderArr(_populationSize);
+
+    // Main
     switch (_stopCondition)
     {
     case Time: {
@@ -192,6 +204,11 @@ void Genetic::solve()
     sortPopulation();
     printf("Najlepszy cMAX wynosi: %u", _population[0].fitness);
 
+    // Delete arrays
+    delete[] _repArr;
+    delete[] _tourArr;
+    delete[] _tourPopArr;
+
 }
 
 void Genetic::solveIterated()
@@ -210,7 +227,6 @@ void Genetic::solveIterated()
         break;
     }
     crossover();
-    findPopFitness();
 
     /*if (_method == Tourney || _method == Tourney_Rank){
         tourney();
@@ -226,15 +242,13 @@ void Genetic::rank()
     switch (_method)
     {
     case Rank:{
-        this->_repArr = new Individual[_repGroupSize];
         std::copy(_population, _population + _repGroupSize, _repArr);
         break;
     }
     case Tourney_Rank: {
-        this->_repArr = new Individual[_repGroupSize];
         sortTourArr();
         std::copy(_tourArr, _tourArr + _repGroupSize, _repArr);
-        delete[] _tourArr;//_tourArr też zrób raz w kostruktorze i niszcz raz w destruktorze
+        //delete[] _tourArr;//_tourArr też zrób raz w kostruktorze i niszcz raz w destruktorze
         break;
     }
     }
@@ -245,40 +259,30 @@ void Genetic::tourney()
     // Generate outcome array
     Individual* tourOutArrName;
     if(_method == Tourney){
-        this->_repArr = new Individual[_repGroupSize];
         tourOutArrName = _repArr;
     }
     else if(_method == Tourney_Rank){
-        this->_tourArr = new Individual[_tourGroupSize];
         tourOutArrName = _tourArr;
     }
 
-    // Generate array to fight
-    uint32_t* tourPopArr = genOrderArr(_populationSize);
-
-    /*uint32_t* tourPopArr = new uint32_t[_populationSize];
-    for (uint32_t i = 0; i < _populationSize; i++){
-        tourPopArr[i] = i;
-    }*/
-
     // Shuffle array to fight
-    std::mt19937_64* tourneyEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-    std::shuffle(tourPopArr, tourPopArr + _populationSize, *tourneyEngine);
+    //std::mt19937_64* tourneyEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+    std::shuffle(_tourPopArr, _tourPopArr + _populationSize, *_rngEngine);
 
     // Fight
     for (uint32_t i = 0; i < _populationSize; i++) {
         if (i % _fightGroupSize == 0) {
-            tourOutArrName[i/_fightGroupSize] = _population[tourPopArr[i]];
+            tourOutArrName[i/_fightGroupSize] = _population[_tourPopArr[i]];
         }
         else {
-            if (_population[tourPopArr[i]].fitness < tourOutArrName[i/_fightGroupSize].fitness) {
-                tourOutArrName[i/_fightGroupSize] = _population[tourPopArr[i]];
+            if (_population[_tourPopArr[i]].fitness < tourOutArrName[i/_fightGroupSize].fitness) {
+                tourOutArrName[i/_fightGroupSize] = _population[_tourPopArr[i]];
             }
         }
     }
 
-    delete[] tourPopArr;
-    delete tourneyEngine;
+    
+    //delete tourneyEngine;
 }
 void Genetic::findPopFitness()
 {

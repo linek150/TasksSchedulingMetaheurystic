@@ -43,8 +43,7 @@ void maxCMAX(std::vector<uint32_t> *tab, uint32_t size) {
         for(uint32_t k = 0; k < tab[i].size(); k++) {
             tmp[i]+=tab[i][k];
         }
-        if (i == 0) { fit=tmp[0]; }
-        else if (tmp[i] < fit) { fit = tmp[i]; }
+        if (tmp[i] > fit) { fit = tmp[i]; }
     }
     std::cout << "cMAX = " << fit << std::endl;
 }

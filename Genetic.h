@@ -41,6 +41,7 @@ private:
     Individual* _siblings;
     Individual* _tourArr;
     uint32_t* _childGenes;
+    uint32_t* _tourPopArr;
 
 
     uint32_t _populationSize;

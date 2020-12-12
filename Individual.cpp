@@ -10,6 +10,7 @@ Individual::Individual(ProblemInstance* pi, uint32_t* genes){
 Individual::Individual(uint32_t* genes)
 {
     this->genes=genes;
+    findFitness();
 }
 Individual::Individual()
 {
@@ -49,11 +50,13 @@ void Individual::copyGenes(Individual& parent,uint32_t numOfGenes,uint32_t* orde
     {
         this->genes[gene]=parent.genes[order[gene]];
     }
+    findFitness();
 }
 void Individual::copyGenes(uint32_t* genes)
 {
     for (uint32_t gene = 0; gene < Individual::_problem ->numOfTasks; gene++)
     {
         this->genes[gene]=genes[gene];
-    }   
+    }
+    findFitness();  
 }
