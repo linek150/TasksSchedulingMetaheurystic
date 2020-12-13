@@ -103,9 +103,9 @@ void Genetic::generatePopulation()
 void Genetic::crossover()
 {
     //randomize parent selection
-    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + _repGroupSize, *_rngEngine);
+    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + _repGroupSize - 1, *_rngEngine);
     //randomize genes selection
-    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks, *_rngEngine);
+    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks - 1, *_rngEngine);
     //genes that need to be taken from first parents coused by numOfTasks%numOfParents!=0
     uint32_t remGenes = this->_remGenes;
     //additional offset coused by numOfTasks%numOfParents!=0
@@ -155,14 +155,14 @@ void Genetic::crossover()
 
 void Genetic::sortPopulation()
 {
-    std::sort(_population, _population + _populationSize,
+    std::sort(_population, _population + _populationSize-1,
     [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; }
     );
 }
 
 void Genetic::sortTourArr()
 {
-    std::sort(_tourArr, _tourArr + _tourGroupSize,
+    std::sort(_tourArr, _tourArr + _tourGroupSize-1,
     [](Individual const & a, Individual const & b) -> bool { return a.fitness < b.fitness; }
     );
 }
@@ -202,7 +202,7 @@ void Genetic::solve()
     }
     }
     sortPopulation();
-    std::cout << "Najlepszy cMAX wynosi: " << _population[0].fitness << std::endl;
+    printf("Najlepszy cMAX wynosi: %u", _population[0].fitness);
 
     // Delete arrays
     delete[] _repArr;
@@ -261,7 +261,7 @@ void Genetic::tourney()
     if(_method == Tourney){
         tourOutArrName = _repArr;
     }
-    else {
+    else if(_method == Tourney_Rank){
         tourOutArrName = _tourArr;
     }
 
@@ -303,4 +303,22 @@ Genetic::~Genetic()
     delete [] _repGrpSizeOrd;
     delete [] _repGenOrd;
     delete[] _tourArr;
+}
+
+void Genetic::printParameters()
+{
+    std::cout<<"Parameters: \n";
+    std::cout<<"_populationSize:"<<_populationSize<<"\n";
+    std::cout<<"_fightGroupSize: "<<_fightGroupSize<<"\n";
+    std::cout<<"_tourGroupSize:"<<_tourGroupSize<<" \n";
+    std::cout<<"_repGroupSize:"<<_repGroupSize<<"\n";
+}
+void Genetic::printIntArray(uint32_t *array, uint32_t size)
+{
+    std::cout<<"[";
+    for (uint32_t i = 0; i < size; i++)
+    {
+        std::cout<<array[i]<<" ";
+    }
+    std::cout<<"]"<<std::endl;
 }
