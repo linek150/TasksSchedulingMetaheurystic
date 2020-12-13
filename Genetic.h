@@ -75,6 +75,11 @@ private:
     void crossover();
     void sortPopulation();
     void sortTourArr();
+    void printParameters();
+    void printIntArray(uint32_t *array, uint32_t size);
+
+
+
     friend int main();//remove after debug
     void printIndividualsArray(Individual *tab, uint32_t size);
 };
