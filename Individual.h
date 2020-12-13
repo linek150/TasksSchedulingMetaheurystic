@@ -10,6 +10,7 @@ public:
     Individual(ProblemInstance* pi, uint32_t* genes);
     Individual(uint32_t* genes);
     Individual();
+    Individual(const Individual& a);
     ~Individual();
 
 

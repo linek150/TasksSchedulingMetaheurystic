@@ -14,11 +14,21 @@ Individual::Individual(uint32_t* genes)
 }
 Individual::Individual()
 {
-    this->genes=new uint32_t[Individual::_problem ->numOfTasks]();
+    this->genes = new uint32_t[Individual::_problem->numOfTasks]{0};
+    fitness = 0;
+}
+Individual::Individual(const Individual& a) {
+    this->fitness = a.fitness;
+    this->genes = new uint32_t[Individual::_problem->numOfTasks]{ 0 };
+    for (uint32_t i = 0; i < Individual::_problem->numOfTasks; i++)
+    {
+        this->genes[i] = a.genes[i];
+    }
+   
 }
 Individual::~Individual()
 {
-    //delete[] genes;
+    delete[] genes;
 }
 
 void Individual::operator=(const Individual&   individualToCopy)
@@ -27,6 +37,7 @@ void Individual::operator=(const Individual&   individualToCopy)
     {
         this->genes[i]=individualToCopy.genes[i];
     }
+    this->fitness = individualToCopy.fitness;
 }
 
 void Individual::findFitness()
@@ -46,11 +57,10 @@ void Individual::findFitness()
 
 void Individual::copyGenes(Individual& parent,uint32_t numOfGenes,uint32_t* order,uint32_t offset)
 {
-    for (uint32_t gene = offset; gene < numOfGenes; gene++)
+    for (uint32_t gene = offset; gene < numOfGenes + offset; gene++)
     {
         this->genes[gene]=parent.genes[order[gene]];
     }
-    findFitness();
 }
 void Individual::copyGenes(uint32_t* genes)
 {

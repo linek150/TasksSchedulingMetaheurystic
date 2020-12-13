@@ -20,8 +20,9 @@ int main() {
     p.genFile("Test.txt");*/
 
 
-    ProblemInstance k(10,3,10,1);
-    Genetic j(&k, 4, 2, 2, 500, 0.5, 0.1, 0.1, 0.5, Rank, Iteration);
+    ProblemInstance k("m25.txt");
+    //ProblemInstance k(100, 4, 60, 1);
+    Genetic j(&k, 1600, 2, 2, 10000, 0.5, 0.95, 0.08, 0.08, Rank, Iteration);
     Greedy g(&k);
     j.solve();
     g.solve();

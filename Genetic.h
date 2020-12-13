@@ -60,15 +60,17 @@ private:
 
     std::mt19937_64* _rngEngine;
     std::uniform_int_distribution<uint32_t>* _rngProcDistribution;
+    std::uniform_real_distribution<float>* _mutationRandGen;
     uint32_t* _repGrpSizeOrd;//order of crossover
     uint32_t* _repGenOrd;
     uint32_t _parentPart;
     uint32_t _remGenes;
+    uint32_t _numOfMutation;
+    uint32_t _extendedPopulationSize;
 
     static uint32_t* genOrderArr(uint32_t numOfElements);
 
     void solveIterated();
-    void findPopFitness();
     void adjustParameters();
     void tourney();
     void rank();
@@ -77,6 +79,7 @@ private:
     void sortTourArr();
     void printParameters();
     void printIntArray(uint32_t *array, uint32_t size);
+    void mutation(uint32_t* tab);
 
 
 
