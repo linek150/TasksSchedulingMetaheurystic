@@ -76,6 +76,7 @@ private:
     void sortPopulation();
     void sortTourArr();
     friend int main();//remove after debug
+    void printIndividualsArray(Individual *tab, uint32_t size);
 };
 
 

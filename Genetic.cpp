@@ -46,6 +46,7 @@ Genetic::Genetic(ProblemInstance *pi,
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
 
     generatePopulation();
+    printIndividualsArray(_population,populationSize);
 }
 void Genetic::setMethod(Method method)
 {
@@ -303,4 +304,15 @@ Genetic::~Genetic()
     delete [] _repGrpSizeOrd;
     delete [] _repGenOrd;
     delete[] _tourArr;
+}
+
+void Genetic::printIndividualsArray(Individual *tab, uint32_t size)
+{
+    for(int element = 0; element < size; element++){
+        std::cout<<"Genes: [";
+        for(int index = 0; index < problem->numOfTasks; index++){
+            std::cout<<tab[element].genes[index]<<" ";
+        }
+        std::cout<<"] cMAX = "<<tab[element].fitness <<std::endl;
+    }
 }
