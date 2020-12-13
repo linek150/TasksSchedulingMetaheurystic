@@ -41,7 +41,7 @@ Genetic::Genetic(ProblemInstance *pi,
     this->_childGenes = new uint32_t[pi->numOfTasks];
 
     this->_rngEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-    this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(1,this->problem->numOfProcessors+1);
+    this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(0,this->problem->numOfProcessors-1);
     this->_repGrpSizeOrd = genOrderArr(this->_repGroupSize);
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
 
@@ -103,9 +103,9 @@ void Genetic::generatePopulation()
 void Genetic::crossover()
 {
     //randomize parent selection
-    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + _repGroupSize - 1, *_rngEngine);
+    std::shuffle(_repGrpSizeOrd, _repGrpSizeOrd + _repGroupSize, *_rngEngine);
     //randomize genes selection
-    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks - 1, *_rngEngine);
+    std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks, *_rngEngine);
     //genes that need to be taken from first parents coused by numOfTasks%numOfParents!=0
     uint32_t remGenes = this->_remGenes;
     //additional offset coused by numOfTasks%numOfParents!=0
@@ -202,7 +202,7 @@ void Genetic::solve()
     }
     }
     sortPopulation();
-    printf("Najlepszy cMAX wynosi: %u", _population[0].fitness);
+    std::cout << "Najlepszy cMAX wynosi: " << _population[0].fitness << std::endl;
 
     // Delete arrays
     delete[] _repArr;
@@ -261,7 +261,7 @@ void Genetic::tourney()
     if(_method == Tourney){
         tourOutArrName = _repArr;
     }
-    else if(_method == Tourney_Rank){
+    else {
         tourOutArrName = _tourArr;
     }
 

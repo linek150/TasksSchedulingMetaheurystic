@@ -18,7 +18,7 @@ Individual::Individual()
 }
 Individual::~Individual()
 {
-    delete[] genes;
+    //delete[] genes;
 }
 
 void Individual::operator=(const Individual&   individualToCopy)
