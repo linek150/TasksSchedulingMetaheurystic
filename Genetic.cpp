@@ -6,6 +6,7 @@
 #include <time.h>
 #include <iostream>
 #include <numeric>
+#include <cmath>
 
 Genetic::Genetic(ProblemInstance *pi,
                  uint32_t populationSize,
@@ -26,6 +27,7 @@ Genetic::Genetic(ProblemInstance *pi,
     this->_stopValue = stopValue;
     this->_tourneyRatio = tourneyRatio;
     this->_mutationChance = mutationChance;
+    this->_mutationRatio = mutationRatio;
     this->_reproductionRatio = reproductionRatio;
     this->_method = method;
     this->_stopCondition = stopCondition;
@@ -44,9 +46,11 @@ Genetic::Genetic(ProblemInstance *pi,
 
     this->_rngEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     this->_rngProcDistribution=new std::uniform_int_distribution<uint32_t>(0,this->problem->numOfProcessors-1);
+    this->_rngCrossCut = new std::uniform_int_distribution<uint32_t>(1, problem->numOfTasks-1);
     this->_mutationRandGen=new std::uniform_real_distribution<float>(0,1);
     this->_repGrpSizeOrd = genOrderArr(this->_repGroupSize);
     this->_repGenOrd = genOrderArr(this->problem->numOfTasks);
+    this->_crossOrder = genOrderArr(this->problem->numOfTasks);
 
     generatePopulation();
     std::cout << "Parametry - konstruktor:" << std::endl;
@@ -88,7 +92,7 @@ void Genetic::adjustParameters()
     }
     this->_parentPart = this->problem->numOfTasks / _numOfParents;
     this->_remGenes = this->problem->numOfTasks % _numOfParents;
-    this->_numOfMutation = _mutationRatio * problem->numOfTasks;
+    this->_numOfMutation = this->_mutationRatio * (float)this->problem->numOfTasks;
     if (_numOfMutation == 0) { _numOfMutation = 1; }
     this->_extendedPopulationSize = _populationSize + _repGroupSize;
 }
@@ -194,6 +198,82 @@ void Genetic::crossover()
     }
 }
 
+void Genetic::crossover2(){
+    
+
+    uint32_t maxFitNum0 = 0;
+    for (uint32_t i = 0; i < ceil(_repGroupSize * 0.95); i++) {
+        maxFitNum0 += std::pow(_population[_populationSize - 1].fitness - _population[i].fitness, 2) + 1;
+    }
+
+    uint32_t maxFitNum1 = 0;
+    for(uint32_t i = 0; i < floor(_repGroupSize*0.95); i++){
+        maxFitNum1+=std::pow(_population[_populationSize-1].fitness - _population[i].fitness,2) + 1;
+    }
+
+    std::uniform_int_distribution<uint32_t>* random0 = new std::uniform_int_distribution<uint32_t>(0, maxFitNum0 - 1);
+    std::uniform_int_distribution<uint32_t>* random1 = new std::uniform_int_distribution<uint32_t>(0, maxFitNum1 - 1);
+
+    for(uint32_t child = 0; child < _repGroupSize; child+=2){
+        uint32_t index1 = index(random0, 0);
+        uint32_t index2 = 0;
+        do {
+            index2 = index(random1, 1);
+        } while(index2 == index1);
+        //std::cout << "Index1 = " << index1 << " Index2 = " << index2 << std::endl;
+
+        // Lista porządkowa
+        std::shuffle(_repGenOrd, _repGenOrd + problem->numOfTasks, *_rngEngine);
+
+        // Miejsce przecięcia
+        uint32_t cutPlace = (*this->_rngCrossCut)(*this->_rngEngine);
+
+        _population[_populationSize+child]=_repArr[index1];
+        _population[_populationSize+child].copyGenes(_population[index2], cutPlace, _crossOrder, 0);
+        mutation(_population[_populationSize+child].genes);
+        _population[_populationSize+child].findFitness();
+
+        _population[_populationSize+child+1]=_repArr[index2];
+        _population[_populationSize+child+1].copyGenes(_population[index1], cutPlace, _crossOrder, 0);
+        //mutation(_population[_populationSize+child+1].genes);
+        mutation2(_population[_populationSize + child + 1].genes);
+        _population[_populationSize+child+1].findFitness();
+
+        /*_population[_populationSize+child]=_repArr[index1];
+        _population[_populationSize+child].copyGenes(_population[index2], problem->numOfTasks/2, _repGenOrd, 0);
+        mutation(_population[_populationSize+child].genes);
+        _population[_populationSize+child].findFitness();
+
+        _population[_populationSize+child+1]=_repArr[index2];
+        _population[_populationSize+child+1].copyGenes(_population[index1], problem->numOfTasks/2, _repGenOrd, 0);
+        //mutation(_population[_populationSize+child+1].genes);
+        mutation2(_population[_populationSize + child + 1].genes);
+        _population[_populationSize+child+1].findFitness();*/
+    }
+
+    delete random0;
+    delete random1;
+}
+
+uint32_t Genetic::index(std::uniform_int_distribution<uint32_t>* ran, uint32_t idx){
+    uint32_t ranNum = (*ran)(*this->_rngEngine);
+
+    uint32_t maxZakres = 0;
+    if (idx == 0) { maxZakres = ceil(_repGroupSize * 0.95); }
+    else { maxZakres = floor(_repGroupSize * 0.95); }
+
+    uint32_t curPos = 0;
+    for (uint32_t i = 0; i < maxZakres; i++) {
+        if (ranNum >= (curPos + std::pow(_population[_populationSize - 1].fitness - _population[i].fitness, 2) + 1)) {
+            curPos += (std::pow(_population[_populationSize - 1].fitness - _population[i].fitness, 2) + 1);
+        }
+        else {
+            return i;
+        }
+    }
+    return maxZakres - 1;
+}
+
 void Genetic::sortPopulation()
 {
     std::sort(_population, _population + _extendedPopulationSize,
@@ -232,7 +312,8 @@ void Genetic::solve()
             sortPopulation();
             std::cout << "Najlepszy cMAX wynosi: " << _population[0].fitness << ", cMAX AVG = ";
             std::cout << std::accumulate(_population, _population + _populationSize, 0,
-                [](uint32_t a, Individual const& b) -> uint32_t { return b.fitness + a; }) / _populationSize << std::endl;
+                [](uint32_t a, Individual const& b) -> uint32_t { return b.fitness + a; }) / _populationSize /*<< std::endl*/;
+            std::cout << " Najgorszy cMAX = " << _population[_populationSize - 1].fitness << std::endl;
             solveIterated();
         }
         break;
@@ -244,7 +325,8 @@ void Genetic::solve()
             sortPopulation();
             std::cout << "Najlepszy cMAX wynosi w " << i << " wynosi: "<< _population[0].fitness << " cMAX AVG = ";
             std::cout << std::accumulate(_population, _population + _populationSize, 0, 
-                [](uint32_t a, Individual const& b) -> uint32_t { return b.fitness + a; })/_populationSize << std::endl;
+                [](uint32_t a, Individual const& b) -> uint32_t { return b.fitness + a; })/_populationSize/* << std::endl*/;
+            std::cout << " Najgorszy cMAX = " << _population[_populationSize-1].fitness << std::endl;
             //std::cout << "Populacja po sortem w " << i << ":" << std::endl;
             //printIndividualsArray(_population, _populationSize);
             solveIterated();
@@ -277,15 +359,8 @@ void Genetic::solveIterated()
         rank();
         break;
     }
-    crossover();
+    crossover2();
 
-    /*if (_method == Tourney || _method == Tourney_Rank){
-        tourney();
-    }
-    if (_method == Rank || _method == Tourney_Rank){
-        rank();
-    }
-    crossover();*/
 }
 
 void Genetic::rank()
@@ -299,7 +374,6 @@ void Genetic::rank()
     case Tourney_Rank: {
         sortTourArr();
         std::copy(_tourArr, _tourArr + _repGroupSize, _repArr);
-        //delete[] _tourArr;//_tourArr też zrób raz w kostruktorze i niszcz raz w destruktorze
         break;
     }
     }
@@ -317,8 +391,6 @@ void Genetic::tourney()
     }
 
     // Shuffle array to fight
-    //std::mt19937_64* tourneyEngine = new std::mt19937_64(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-
     std::shuffle(_tourPopArr, _tourPopArr + _populationSize, *_rngEngine);
 
     // Fight
@@ -332,20 +404,6 @@ void Genetic::tourney()
             }
         }
     }
-
-    
-    //delete tourneyEngine;
-}
-
-Genetic::~Genetic()
-{
-    delete [] _population;
-    delete [] _siblings;
-    delete [] _childGenes;
-    delete _rngEngine;
-    delete _rngProcDistribution;
-    delete [] _repGrpSizeOrd;
-    delete [] _repGenOrd;
 }
 
 void Genetic::printIndividualsArray(Individual *tab, uint32_t size)
@@ -376,10 +434,50 @@ void Genetic::printIntArray(uint32_t *array, uint32_t size)
     std::cout<<"]"<<std::endl;
 }
 
-void Genetic::mutation(uint32_t *tab) {
+void Genetic::mutation2(uint32_t *tab) {
     if ((*this->_mutationRandGen)(*this->_rngEngine) <= _mutationChance) {
-        for (uint32_t gene = 0; gene < _numOfMutation; gene++) {
+        /*for (uint32_t gene = 0; gene < _numOfMutation; gene++) {
+            tab[_repGenOrd[gene]] = (*this->_rngProcDistribution)(*this->_rngEngine);
+        }*/
+        std::uniform_int_distribution<uint32_t>* numMut = new std::uniform_int_distribution<uint32_t>(1, _numOfMutation);
+        uint32_t maxMutNum = (*numMut)(*this->_rngEngine);
+        for (uint32_t gene = 0; gene < maxMutNum; gene++) {
             tab[_repGenOrd[gene]] = (*this->_rngProcDistribution)(*this->_rngEngine);
         }
+        delete numMut;
     }
+}
+
+void Genetic::mutation(uint32_t* tab) {
+    if ((*this->_mutationRandGen)(*this->_rngEngine) <= _mutationChance) {
+        //for (uint32_t gene = 0; gene < _numOfMutation; gene++) {
+        std::uniform_int_distribution<uint32_t>* numMut = new std::uniform_int_distribution<uint32_t>(1, _numOfMutation);
+        uint32_t maxMutNum = (*numMut)(*this->_rngEngine);
+        for (uint32_t gene = 0; gene < maxMutNum; gene++) {
+            if (gene == (_numOfMutation - 1)) {
+                uint32_t tmp = tab[_repGenOrd[gene]];
+                tab[_repGenOrd[gene]] = tab[_repGenOrd[0]];
+                tab[_repGenOrd[0]] = tmp;
+            }
+            else {
+                uint32_t tmp = tab[_repGenOrd[gene]];
+                tab[_repGenOrd[gene]] = tab[_repGenOrd[gene + 1]];
+                tab[_repGenOrd[gene + 1]] = tmp;
+            }
+        }
+        delete numMut;
+    }
+}
+
+Genetic::~Genetic()
+{
+    delete [] _population;
+    delete [] _siblings;
+    delete [] _childGenes;
+    delete _rngEngine;
+    delete _rngProcDistribution;
+    delete _rngCrossCut;
+    delete [] _repGrpSizeOrd;
+    delete [] _repGenOrd;
+    delete [] _crossOrder;
 }

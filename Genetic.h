@@ -60,9 +60,11 @@ private:
 
     std::mt19937_64* _rngEngine;
     std::uniform_int_distribution<uint32_t>* _rngProcDistribution;
+    std::uniform_int_distribution<uint32_t>* _rngCrossCut;
     std::uniform_real_distribution<float>* _mutationRandGen;
     uint32_t* _repGrpSizeOrd;//order of crossover
     uint32_t* _repGenOrd;
+    uint32_t* _crossOrder;
     uint32_t _parentPart;
     uint32_t _remGenes;
     uint32_t _numOfMutation;
@@ -75,11 +77,14 @@ private:
     void tourney();
     void rank();
     void crossover();
+    uint32_t index(std::uniform_int_distribution<uint32_t>* ran, uint32_t idx);
+    void crossover2();
     void sortPopulation();
     void sortTourArr();
     void printParameters();
     void printIntArray(uint32_t *array, uint32_t size);
     void mutation(uint32_t* tab);
+    void mutation2(uint32_t* tab);
 
 
 
